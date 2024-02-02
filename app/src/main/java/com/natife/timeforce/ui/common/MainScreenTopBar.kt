@@ -25,6 +25,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.natife.timeforce.R
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,7 +59,7 @@ fun MainScreenTopBar(
                     .clip(RoundedCornerShape(15.dp, 15.dp, 0.dp, 0.dp))
             ) {
                 DropdownMenuItem(
-                    text = { Text(text = stringResource(R.string.settings)) },
+                    text = { Text(text = stringResource(R.string.settings), fontSize = 16.sp) },
                     onClick = {
                         Toast.makeText(
                             context,
@@ -67,7 +68,12 @@ fun MainScreenTopBar(
                         ).show()
                     })
                 DropdownMenuItem(
-                    text = { Text(text = stringResource(R.string.private_policy)) },
+                    text = {
+                        Text(
+                            text = stringResource(R.string.private_policy),
+                            fontSize = 16.sp
+                        )
+                    },
                     onClick = {
                         Toast.makeText(
                             context,

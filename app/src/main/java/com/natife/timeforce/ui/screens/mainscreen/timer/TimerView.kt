@@ -21,18 +21,10 @@ import com.natife.timeforce.R
 import com.natife.timeforce.ui.common.MainScreenTopBar
 import com.natife.timeforce.ui.theme.AppTheme
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TimerView() {
     AppTheme {
-        val scrollBehavior = TopAppBarDefaults.pinnedScrollBehavior(rememberTopAppBarState())
-        Scaffold(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection),
-            topBar = {
-                MainScreenTopBar(
-                    scrollBehavior = scrollBehavior,
-                    title = stringResource(id = R.string.timer_title)
-                )
-            }) { innerPadding ->
+        Scaffold { innerPadding ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()

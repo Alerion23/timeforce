@@ -6,7 +6,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import com.natife.timeforce.ui.screens.mainscreen.alarm.AlarmClockView
 import com.natife.timeforce.ui.screens.mainscreen.clock.ClockView
-import com.natife.timeforce.ui.screens.mainscreen.stopwatch.StopWatchView
+import com.natife.timeforce.ui.screens.mainscreen.stopwatch.StopWatchScreen
 import com.natife.timeforce.ui.screens.mainscreen.timer.TimerView
 
 @Composable
@@ -22,7 +22,7 @@ fun BottomNavGraph(navController: NavHostController) {
             ClockView()
         }
         composable(route = BottomNavItem.StopWatch.screenRoute) {
-            StopWatchView()
+            StopWatchScreen()
         }
         composable(route = BottomNavItem.Timer.screenRoute) {
             TimerView()
