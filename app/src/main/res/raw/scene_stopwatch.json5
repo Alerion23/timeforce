@@ -1,0 +1,65 @@
+{
+  ConstraintSets: {
+    start: {
+      timer_view: {
+        start: ['parent', 'start', 32],
+        end: ['parent', 'end', 32],
+        top: ['middle_line', 'top', 0],
+        bottom: ['middle_line', 'bottom', 0],
+        width: 'spread',
+        custom: {
+          ratio: 1
+        },
+      },
+      laps_list: {
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+        top: ['middle_line', 'bottom', 8],
+        bottom: ['parent', 'bottom', 0],
+        visibility: 'invisible',
+        width: 'spread',
+        height: 'spread',
+
+      },
+      middle_line: {
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+        top: ['parent', 'top', 0],
+        bottom: ['parent', 'bottom', 0]
+      }
+    },
+    end: {
+      timer_view: {
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+        top: ['parent', 'top', 16],
+        bottom: ['middle_line', 'top', 16],
+        height: 'spread',
+        custom: {
+          ratio: 1
+        },
+      },
+      laps_list: {
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+        top: ['middle_line', 'bottom', 8],
+        bottom: ['parent', 'bottom', 0],
+        visibility: 'visible',
+        width: 'spread',
+        height: 'spread',
+      },
+      middle_line: {
+        start: ['parent', 'start', 0],
+        end: ['parent', 'end', 0],
+        top: ['parent', 'top', 0],
+        bottom: ['parent', 'bottom', 0]
+      }
+    }
+  },
+  Transitions: {
+    start_to_end: {
+      from: 'start',
+        to: 'end'
+    }
+  }
+}

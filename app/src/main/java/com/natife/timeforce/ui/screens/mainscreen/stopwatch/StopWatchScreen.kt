@@ -1,178 +1,138 @@
 package com.natife.timeforce.ui.screens.mainscreen.stopwatch
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.Refresh
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
+import androidx.constraintlayout.compose.ExperimentalMotionApi
+import androidx.constraintlayout.compose.MotionLayout
+import androidx.constraintlayout.compose.MotionScene
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.natife.timeforce.R
-import com.natife.timeforce.ui.theme.AppTheme
-import com.natife.timeforce.utils.collectAsStateLifecycleAware
+import com.natife.timeforce.ui.screens.mainscreen.stopwatch.components.LapList
+import com.natife.timeforce.ui.screens.mainscreen.stopwatch.components.StopwatchButtonsControl
+import com.natife.timeforce.ui.screens.mainscreen.stopwatch.components.TimerView
+import com.natife.timeforce.ui.theme.TimeForceTheme
+import com.natife.timeforce.ui.viewmodel.StopwatchViewModel
 
 @Composable
 fun StopWatchScreen(
-    stopwatchViewModel: StopwatchViewModel = hiltViewModel()
+    viewModel: StopwatchViewModel = hiltViewModel()
 ) {
-    AppTheme {
-        Scaffold { innerPadding ->
-            StopwatchView(
-                innerPadding,
-                stopwatchViewModel
-            )
-        }
-    }
-}
-
-@Composable
-fun StopwatchView(
-    innerPaddingValues: PaddingValues,
-    stopwatchViewModel: StopwatchViewModel
-) {
-    val context = LocalContext.current
-    val localDensity = LocalDensity.current
-    val mainTime: String by stopwatchViewModel.mainTime.collectAsStateLifecycleAware()
-    val stopwatchState by stopwatchViewModel.stopwatchState.collectAsStateLifecycleAware()
-    val cardWidth = remember {
-        mutableStateOf(0.dp)
-    }
-    Column(
-        modifier = Modifier
-            .padding(innerPaddingValues)
-            .fillMaxWidth()
-            .fillMaxHeight(),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Card(
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 10.dp
-            ),
-            shape = RoundedCornerShape(20.dp),
-            modifier = Modifier
-                .padding(20.dp)
-                .fillMaxWidth()
-                .onGloballyPositioned {
-                    cardWidth.value = with(localDensity) {
-                        it.size.width.toDp()
-                    }
-                }
-        ) {
-            Surface(
-                modifier = Modifier
-                    .size(cardWidth.value)
-                    .padding(20.dp),
-                shape = RoundedCornerShape(50),
-                color = Color.Transparent,
-                border = BorderStroke(10.dp, MaterialTheme.colorScheme.onPrimaryContainer)
-            ) {
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = mainTime,
-                        textAlign = TextAlign.Center,
-                        fontSize = 40.sp,
-                        color = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-            StopwatchButtonsControl(
-                stopwatchState = stopwatchState,
-                stopwatchViewModel = stopwatchViewModel
-            )
-        }
-    }
-}
-
-@Composable
-fun ClearButtonStopwatch() {
-    Button(onClick = {  }) {
-        Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Clear button")
-    }
-}
-
-@Composable
-fun StopwatchButtonsControl(
-    stopwatchState: StopwatchState,
-    stopwatchViewModel: StopwatchViewModel
-) {
-    val pauseIcon = ImageVector.vectorResource(id = R.drawable.icon_pause_24)
-    val icon = remember {
-        mutableStateOf(
-            if (stopwatchState == StopwatchState.Stopped || stopwatchState == StopwatchState.Idle) {
-                Icons.Filled.PlayArrow
-            } else {
-                pauseIcon
-            }
+    TimeForceTheme {
+        StopwatchView(
+            viewModel
         )
     }
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        if (stopwatchState == StopwatchState.Stopped) {
-            ClearButtonStopwatch()
+}
+
+@OptIn(ExperimentalMotionApi::class)
+@Composable
+fun StopwatchView(
+    viewModel: StopwatchViewModel
+) {
+
+    ConstraintLayout(modifier = Modifier.fillMaxSize()) {
+        val context = LocalContext.current
+        val sceneFile = R.raw.scene_stopwatch
+        val motionSceneContent = remember(sceneFile) {
+            context.resources
+                .openRawResource(sceneFile)
+                .readBytes()
+                .decodeToString()
         }
-        Button(
+        var fadeHeight by remember {
+            mutableStateOf(0.dp)
+        }
+        val (buttons, timer) = createRefs()
+        val currentState by viewModel.stopwatchState.collectAsStateWithLifecycle()
+        val lapList by viewModel.lapList.collectAsStateWithLifecycle()
+        val progress by animateFloatAsState(
+            targetValue = if (lapList.isNotEmpty()) 1f else 0f,
+            animationSpec = tween(1000), label = "",
+        )
+        val buttonHeightAnimation by animateDpAsState(
+            targetValue = if (lapList.isNotEmpty()) 0.dp else fadeHeight,
+            label = "", animationSpec = tween(1000)
+        )
+        LaunchedEffect(key1 = Unit) {
+            viewModel.startObserving()
+        }
+        MotionLayout(
             modifier = Modifier
-                .size(100.dp),
-            onClick = {
-                if (stopwatchState == StopwatchState.Started) {
-                    icon.value = Icons.Filled.PlayArrow
-                } else {
-                    icon.value = pauseIcon
+                .constrainAs(timer) {
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    top.linkTo(parent.top)
+                    bottom.linkTo(parent.bottom)
+                    width = Dimension.fillToConstraints
+                    height = Dimension.fillToConstraints
                 }
-                stopwatchViewModel.startStopwatch()
-            }) {
-            Icon(
-                imageVector = icon.value, contentDescription = "Start/pause button"
+                .padding(bottom = buttonHeightAnimation),
+            motionScene = MotionScene(content = motionSceneContent),
+            progress = progress
+        ) {
+            val properties = motionProperties(id = "timer_view")
+            Spacer(modifier = Modifier.layoutId("middle_line"))
+            LapList(
+                lapList = lapList,
+                modifier = Modifier.layoutId("laps_list"),
+                fadeHeight = fadeHeight,
+            )
+            TimerView(
+                viewModel = viewModel,
+                modifier = Modifier
+                    .layoutId("timer_view")
+                    .aspectRatio(properties.value.float("ratio")),
             )
         }
-        if (stopwatchState == StopwatchState.Started) {
-            Button(onClick = {  }) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = R.drawable.icon_stopwatch),
-                    contentDescription = "Lap"
-                )
-            }
-            Button(onClick = {}) {
-                Icon(imageVector = Icons.Filled.Refresh, contentDescription = "Clear button")
-            }
-        }
+        StopwatchButtonsControl(
+            modifier = Modifier.constrainAs(buttons) {
+                bottom.linkTo(parent.bottom)
+                start.linkTo(parent.start)
+                end.linkTo(parent.end)
+                width = Dimension.fillToConstraints
+            },
+            state = currentState,
+            onMainClick = { state ->
+                when (state) {
+                    StopwatchState.Started -> {
+                        viewModel.startStopwatch()
+                    }
+
+                    StopwatchState.Stopped -> {
+                        viewModel.stop()
+                    }
+
+                    StopwatchState.Idle -> {
+                        viewModel.startStopwatch()
+                    }
+                }
+            },
+            onResetClick = {
+                viewModel.reset()
+            },
+            onLapClick = {
+                viewModel.lap()
+            },
+            fadeHeight = {
+                fadeHeight = it
+            })
     }
 }

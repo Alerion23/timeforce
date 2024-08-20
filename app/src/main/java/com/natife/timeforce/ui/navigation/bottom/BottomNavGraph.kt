@@ -1,4 +1,4 @@
-package com.natife.timeforce.navigation
+package com.natife.timeforce.ui.navigation.bottom
 
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
